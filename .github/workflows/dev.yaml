@@ -5,31 +5,13 @@ on:
   push:
     branches: [ master ]
 
-  # Allows you to run this workflow manually from the Actions tab
-  # pass the necessary variables here to create the stack.
-  #workflow_dispatch:
-  #  inputs:
-  #    region:
-  #      description: "AWS Region to deploy:"
-  #      required: true
-  #      default: 'us-east-1'
-  #    bucketName:
-  #      description: "S3 Bucket Name:"
-  #     required: true
-  #      default: 'sam-deployment-usecase'
-  #    deploymentEnv:
-  #      description: "dev/qa/prod:"
-  #      required: true
-  #      default: 'dev'
-         
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
 
   upload:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Copy file to S3
+      - name: Copy-file to S3
         shell: bash
         env:
           aws_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -40,28 +22,5 @@ jobs:
           aws configure set aws_access_key_id $aws_key_id
           aws configure set aws_secret_access_key $aws_secret_access_key 
           aws configure set default.region us-east-1
-          aws s3 cp ./dev_param.json s3://$aws_s3_bucket/soho/config/
-  dev-deployment:
-    needs: upload
-    runs-on: ubuntu-latest
-    environment: dev
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        
-      - name: Configure AWS credentials
-        id: creds
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-
-      - name: Deploy S3 Buckets CloudFormation Stacks
-        id: s3-buckets
-        uses: aws-actions/aws-cloudformation-github-deploy@v1
-        with:
-          name:  s3-buckets
-          template: s3.yaml
-          no-fail-on-empty-changeset: "1"
-          parameter-overrides: file://${{ github.workspace }}/dev_param.json
+          result = aws cloudformation describe-stacks --stack-name s3-buckets
+          echo $result
