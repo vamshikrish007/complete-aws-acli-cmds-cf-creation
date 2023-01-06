@@ -27,6 +27,9 @@ jobs:
           aws configure set default.region us-east-1
           result=`aws cloudformation describe-stacks --stack-name 's3-buckets' --query 'Stacks[0].StackStatus' --output text`
           echo "::set-output name=test::$result"
+      - uses: actions/checkout@v2
+      - name: Validate-result.
+        shell: bash
       - id: step2
         run: |
           echo ${{ needs.outputs.output1 }}
