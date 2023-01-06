@@ -7,23 +7,28 @@ on:
 
 jobs:
 
-  upload:
+  ValidateIFStackCreatedOrNot:
     runs-on: ubuntu-latest
+    outputs:
+      output1: ${{ steps.step1.output.test }}
     steps:
       - uses: actions/checkout@v2
-      - name: Copy-file to S3
+      - name: Validate-Stack-Presence.
         shell: bash
         env:
           aws_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_s3_bucket: 'advance-use-case-dev'
+      - id: step1
         run: |
           sudo apt-get update && sudo apt-get -y install awscli
           aws configure set aws_access_key_id $aws_key_id
           aws configure set aws_secret_access_key $aws_secret_access_key 
           aws configure set default.region us-east-1
           result=`aws cloudformation describe-stacks --stack-name 's3-buckets' --query 'Stacks[0].StackStatus' --output text`
-          echo "print result"
-          echo $result
+          echo "::set-output name=test::$result"
+      - id: step2
+        run: |
+          echo ${{ needs.outputs.output1 }}
 
 
